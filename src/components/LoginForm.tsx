@@ -1,7 +1,16 @@
 import { useState, type FormEvent } from 'react'
 import { DEFAULT_API_URL } from '../constants'
 import { useAuth } from '../context/useAuth'
-import './LoginForm.css'
+import {
+  Field,
+  LoginCard,
+  LoginError,
+  LoginLogo,
+  LoginPage,
+  LoginSubmit,
+  LoginSubtitle,
+  LoginTitle,
+} from './LoginForm.styles'
 
 export function LoginForm() {
   const { login } = useAuth()
@@ -27,17 +36,17 @@ export function LoginForm() {
   }
 
   return (
-    <div className="login-page">
-      <form className="login-card" onSubmit={handleSubmit}>
-        <div className="login-logo" aria-hidden="true">
+    <LoginPage>
+      <LoginCard onSubmit={handleSubmit}>
+        <LoginLogo aria-hidden="true">
           <span>M</span>
-        </div>
-        <h1 className="login-title">Вход в MAX Chat</h1>
-        <p className="login-subtitle">
+        </LoginLogo>
+        <LoginTitle>Вход в MAX Chat</LoginTitle>
+        <LoginSubtitle>
           Введите данные инстанса из личного кабинета GREEN-API
-        </p>
+        </LoginSubtitle>
 
-        <label className="field">
+        <Field>
           <span>idInstance</span>
           <input
             type="text"
@@ -47,9 +56,9 @@ export function LoginForm() {
             autoComplete="off"
             required
           />
-        </label>
+        </Field>
 
-        <label className="field">
+        <Field>
           <span>apiTokenInstance</span>
           <input
             type="password"
@@ -59,9 +68,9 @@ export function LoginForm() {
             autoComplete="off"
             required
           />
-        </label>
+        </Field>
 
-        <label className="field">
+        <Field>
           <span>apiUrl</span>
           <input
             type="url"
@@ -69,14 +78,12 @@ export function LoginForm() {
             onChange={(e) => setApiUrl(e.target.value)}
             placeholder={DEFAULT_API_URL}
           />
-        </label>
+        </Field>
 
-        {error ? <p className="login-error">{error}</p> : null}
+        {error ? <LoginError>{error}</LoginError> : null}
 
-        <button type="submit" className="login-submit">
-          Войти
-        </button>
-      </form>
-    </div>
+        <LoginSubmit type="submit">Войти</LoginSubmit>
+      </LoginCard>
+    </LoginPage>
   )
 }

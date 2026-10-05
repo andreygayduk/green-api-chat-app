@@ -8,11 +8,26 @@ import {
 import { useAuth } from '../context/useAuth'
 import { useNotificationPoller } from '../hooks/useNotificationPoller'
 import type { Chat, Message } from '../types'
+import {
+  BackBtn,
+  BrandMark,
+  ChatApp,
+  ChatHeader,
+  ChatHeaderAvatar,
+  ChatHeaderInfo,
+  ChatMain,
+  ChatPlaceholder,
+  ChatSidebar,
+  LogoutBtn,
+  PlaceholderLogo,
+  SendError,
+  SidebarBrand,
+  SidebarTop,
+} from './ChatLayout.styles'
 import { ChatList } from './ChatList'
 import { MessageInput } from './MessageInput'
 import { MessageList } from './MessageList'
 import { NewChatModal } from './NewChatModal'
-import './ChatLayout.css'
 
 function createOutgoingMessage(chatId: string, text: string, idMessage: string): Message {
   return {
@@ -138,63 +153,62 @@ export function ChatLayout() {
   }
 
   return (
-    <div className="chat-app">
-      <div className={`chat-sidebar${mobileShowChat ? ' hidden-mobile' : ''}`}>
-        <div className="sidebar-top">
-          <div className="sidebar-brand">
-            <span className="brand-mark">M</span>
+    <ChatApp>
+      <ChatSidebar $hiddenMobile={mobileShowChat}>
+        <SidebarTop>
+          <SidebarBrand>
+            <BrandMark>M</BrandMark>
             <span>MAX</span>
-          </div>
-          <button type="button" className="logout-btn" onClick={logout}>
+          </SidebarBrand>
+          <LogoutBtn type="button" onClick={logout}>
             Выйти
-          </button>
-        </div>
+          </LogoutBtn>
+        </SidebarTop>
         <ChatList
           chats={chats}
           activeChatId={activeChatId}
           onSelect={selectChat}
           onNewChat={() => setShowNewChat(true)}
         />
-      </div>
+      </ChatSidebar>
 
-      <main className={`chat-main${mobileShowChat ? ' visible-mobile' : ''}`}>
+      <ChatMain $visibleMobile={mobileShowChat}>
         {activeChat ? (
           <>
-            <header className="chat-header">
-              <button
+            <ChatHeader>
+              <BackBtn
                 type="button"
-                className="back-btn"
                 onClick={() => setMobileShowChat(false)}
                 aria-label="Назад к списку"
               >
                 ←
-              </button>
-              <span className="chat-header-avatar" aria-hidden="true">
+              </BackBtn>
+              <ChatHeaderAvatar aria-hidden="true">
                 {activeChat.name.slice(0, 1).toUpperCase()}
-              </span>
-              <div className="chat-header-info">
+              </ChatHeaderAvatar>
+              <ChatHeaderInfo>
                 <strong>{activeChat.name}</strong>
                 <span>{activeChat.chatId}</span>
-              </div>
-            </header>
+              </ChatHeaderInfo>
+            </ChatHeader>
 
             <MessageList messages={activeChat.messages} />
 
-            {sendError ? <p className="send-error">{sendError}</p> : null}
+            {sendError ? <SendError>{sendError}</SendError> : null}
 
             <MessageInput onSend={handleSend} />
           </>
         ) : (
-          <div className="chat-placeholder">
-            <div className="placeholder-logo">M</div>
+          <ChatPlaceholder>
+            <PlaceholderLogo>M</PlaceholderLogo>
             <p>Выберите чат или создайте новый</p>
-          </div>
+          </ChatPlaceholder>
         )}
-      </main>
+      </ChatMain>
 
       {showNewChat ? (
         <NewChatModal onClose={() => setShowNewChat(false)} onCreate={createChat} />
       ) : null}
-    </div>
+    </ChatApp>
   )
 }

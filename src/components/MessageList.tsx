@@ -1,6 +1,13 @@
 import { useEffect, useRef } from 'react'
 import type { Message } from '../types'
-import './MessageList.css'
+import {
+  MessageBubble,
+  MessageListEmpty,
+  MessageListRoot,
+  MessageRow,
+  MessageText,
+  MessageTime,
+} from './MessageList.styles'
 
 interface MessageListProps {
   messages: Message[]
@@ -21,23 +28,20 @@ export function MessageList({ messages }: MessageListProps) {
   }, [messages])
 
   return (
-    <div className="message-list">
+    <MessageListRoot>
       {messages.length === 0 ? (
-        <p className="message-list-empty">Напишите первое сообщение</p>
+        <MessageListEmpty>Напишите первое сообщение</MessageListEmpty>
       ) : (
         messages.map((message) => (
-          <div
-            key={message.id}
-            className={`message-row ${message.direction}`}
-          >
-            <div className="message-bubble">
-              <p className="message-text">{message.text}</p>
-              <time className="message-time">{formatTime(message.timestamp)}</time>
-            </div>
-          </div>
+          <MessageRow key={message.id} $direction={message.direction}>
+            <MessageBubble $direction={message.direction}>
+              <MessageText>{message.text}</MessageText>
+              <MessageTime>{formatTime(message.timestamp)}</MessageTime>
+            </MessageBubble>
+          </MessageRow>
         ))
       )}
       <div ref={bottomRef} />
-    </div>
+    </MessageListRoot>
   )
 }

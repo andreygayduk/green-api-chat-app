@@ -38,4 +38,4 @@ npm run dev
 
 - React 19 + TypeScript
 - Vite
-- CSS без UI-библиотек
+- Styled-components

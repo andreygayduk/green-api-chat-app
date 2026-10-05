@@ -1,5 +1,16 @@
 import type { Chat } from '../types'
-import './ChatList.css'
+import {
+  ChatAvatar,
+  ChatListEmpty,
+  ChatListHeader,
+  ChatListItem,
+  ChatListItems,
+  ChatListRoot,
+  ChatMeta,
+  ChatName,
+  ChatPreview,
+  NewChatBtn,
+} from './ChatList.styles'
 
 interface ChatListProps {
   chats: Chat[]
@@ -15,37 +26,37 @@ function lastPreview(chat: Chat): string {
 
 export function ChatList({ chats, activeChatId, onSelect, onNewChat }: ChatListProps) {
   return (
-    <aside className="chat-list">
-      <header className="chat-list-header">
+    <ChatListRoot>
+      <ChatListHeader>
         <h2>Чаты</h2>
-        <button type="button" className="new-chat-btn" onClick={onNewChat} title="Новый чат">
+        <NewChatBtn type="button" onClick={onNewChat} title="Новый чат">
           +
-        </button>
-      </header>
+        </NewChatBtn>
+      </ChatListHeader>
 
-      <ul className="chat-list-items">
+      <ChatListItems>
         {chats.length === 0 ? (
-          <li className="chat-list-empty">Создайте новый чат</li>
+          <ChatListEmpty>Создайте новый чат</ChatListEmpty>
         ) : (
           chats.map((chat) => (
             <li key={chat.chatId}>
-              <button
+              <ChatListItem
                 type="button"
-                className={`chat-list-item${activeChatId === chat.chatId ? ' active' : ''}`}
+                $active={activeChatId === chat.chatId}
                 onClick={() => onSelect(chat.chatId)}
               >
-                <span className="chat-avatar" aria-hidden="true">
+                <ChatAvatar aria-hidden="true">
                   {chat.name.slice(0, 1).toUpperCase()}
-                </span>
-                <span className="chat-meta">
-                  <span className="chat-name">{chat.name}</span>
-                  <span className="chat-preview">{lastPreview(chat)}</span>
-                </span>
-              </button>
+                </ChatAvatar>
+                <ChatMeta>
+                  <ChatName>{chat.name}</ChatName>
+                  <ChatPreview>{lastPreview(chat)}</ChatPreview>
+                </ChatMeta>
+              </ChatListItem>
             </li>
           ))
         )}
-      </ul>
-    </aside>
+      </ChatListItems>
+    </ChatListRoot>
   )
 }

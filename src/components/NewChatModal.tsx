@@ -1,5 +1,14 @@
 import { useState, type FormEvent } from 'react'
-import './NewChatModal.css'
+import {
+  BtnPrimary,
+  BtnSecondary,
+  ModalActions,
+  ModalBackdrop,
+  ModalCard,
+  ModalError,
+  ModalHint,
+  ModalInput,
+} from './NewChatModal.styles'
 
 interface NewChatModalProps {
   onClose: () => void
@@ -33,20 +42,19 @@ export function NewChatModal({ onClose, onCreate }: NewChatModalProps) {
   }
 
   return (
-    <div className="modal-backdrop" onClick={onClose} role="presentation">
-      <div
-        className="modal-card"
+    <ModalBackdrop onClick={onClose} role="presentation">
+      <ModalCard
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-labelledby="new-chat-title"
       >
         <h2 id="new-chat-title">Новый чат</h2>
-        <p className="modal-hint">
+        <ModalHint>
           Номер телефона (79991234567) или chatId получателя в MAX
-        </p>
+        </ModalHint>
 
         <form onSubmit={handleSubmit}>
-          <input
+          <ModalInput
             type="text"
             value={value}
             onChange={(e) => setValue(e.target.value)}
@@ -55,18 +63,18 @@ export function NewChatModal({ onClose, onCreate }: NewChatModalProps) {
             disabled={loading}
           />
 
-          {error ? <p className="modal-error">{error}</p> : null}
+          {error ? <ModalError>{error}</ModalError> : null}
 
-          <div className="modal-actions">
-            <button type="button" className="btn-secondary" onClick={onClose} disabled={loading}>
+          <ModalActions>
+            <BtnSecondary type="button" onClick={onClose} disabled={loading}>
               Отмена
-            </button>
-            <button type="submit" className="btn-primary" disabled={loading}>
+            </BtnSecondary>
+            <BtnPrimary type="submit" disabled={loading}>
               {loading ? 'Создание…' : 'Создать'}
-            </button>
-          </div>
+            </BtnPrimary>
+          </ModalActions>
         </form>
-      </div>
-    </div>
+      </ModalCard>
+    </ModalBackdrop>
   )
 }
