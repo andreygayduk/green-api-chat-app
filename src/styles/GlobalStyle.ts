@@ -8,8 +8,7 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   html,
-  body,
-  #root {
+  body {
     height: 100%;
     margin: 0;
   }

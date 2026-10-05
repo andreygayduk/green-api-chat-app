@@ -40,7 +40,7 @@ export const theme = {
     focus: '0 0 0 3px rgba(59, 130, 246, 0.15)',
   },
   fonts: {
-    body: "'Manrope', system-ui, -apple-system, sans-serif",
+    body: "var(--font-manrope), system-ui, -apple-system, sans-serif",
   },
   gradients: {
     brand: 'linear-gradient(135deg, #3b82f6, #6366f1)',

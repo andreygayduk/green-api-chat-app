@@ -25,7 +25,7 @@ npm install
 npm run dev
 ```
 
-Откройте адрес из терминала (обычно http://localhost:5173).
+Откройте адрес из терминала (обычно http://localhost:3000).
 
 ## Как пользоваться
 
@@ -36,6 +36,5 @@ npm run dev
 
 ## Стек
 
-- React 19 + TypeScript
-- Vite
+- Next.js (App Router) + React 19 + TypeScript
 - Styled-components

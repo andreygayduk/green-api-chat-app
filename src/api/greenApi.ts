@@ -10,8 +10,8 @@ const DEFAULT_HOST = 'https://api.green-api.com'
 function resolveBaseUrl(apiUrl: string): string {
   const base = apiUrl.replace(/\/$/, '')
 
-  // In Vite dev, route default GREEN-API host through proxy to avoid CORS
-  if (import.meta.env.DEV && base === DEFAULT_HOST) {
+  // In Next.js dev, route default GREEN-API host through rewrite to avoid CORS
+  if (process.env.NODE_ENV === 'development' && base === DEFAULT_HOST) {
     return '/green-api'
   }
 

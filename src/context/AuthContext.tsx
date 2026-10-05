@@ -1,5 +1,8 @@
+'use client'
+
 import {
   useCallback,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -25,9 +28,13 @@ function loadCredentials(): Credentials | null {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [credentials, setCredentials] = useState<Credentials | null>(() =>
-    loadCredentials(),
-  )
+  const [credentials, setCredentials] = useState<Credentials | null>(null)
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    setCredentials(loadCredentials())
+    setReady(true)
+  }, [])
 
   const login = useCallback((next: Credentials) => {
     const normalized: Credentials = {
@@ -45,8 +52,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const value = useMemo(
-    () => ({ credentials, login, logout }),
-    [credentials, login, logout],
+    () => ({ credentials, ready, login, logout }),
+    [credentials, ready, login, logout],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
