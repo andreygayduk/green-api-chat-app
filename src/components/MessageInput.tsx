@@ -1,4 +1,5 @@
-import { useState, type FormEvent, type KeyboardEvent } from 'react'
+import { type KeyboardEvent } from 'react'
+import { useForm } from 'react-hook-form'
 import { MessageInputForm, MessageTextarea, SendBtn } from './MessageInput.styles'
 
 interface MessageInputProps {
@@ -6,27 +7,36 @@ interface MessageInputProps {
   onSend: (text: string) => Promise<void>
 }
 
+interface MessageFormValues {
+  text: string
+}
+
 export function MessageInput({ disabled, onSend }: MessageInputProps) {
-  const [text, setText] = useState('')
-  const [sending, setSending] = useState(false)
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { isSubmitting },
+  } = useForm<MessageFormValues>({
+    defaultValues: { text: '' },
+  })
 
-  const submit = async () => {
-    const trimmed = text.trim()
-    if (!trimmed || sending || disabled) return
+  const text = watch('text')
+  const { onChange, onBlur, name, ref } = register('text', {
+    required: true,
+    maxLength: 4000,
+  })
 
-    setSending(true)
-    try {
-      await onSend(trimmed)
-      setText('')
-    } finally {
-      setSending(false)
-    }
+  const onSubmit = async (data: MessageFormValues) => {
+    const trimmed = data.text.trim()
+    if (!trimmed || disabled) return
+
+    await onSend(trimmed)
+    reset({ text: '' })
   }
 
-  const handleSubmit = (event: FormEvent) => {
-    event.preventDefault()
-    void submit()
-  }
+  const submit = handleSubmit(onSubmit)
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -36,19 +46,21 @@ export function MessageInput({ disabled, onSend }: MessageInputProps) {
   }
 
   return (
-    <MessageInputForm onSubmit={handleSubmit}>
+    <MessageInputForm onSubmit={submit}>
       <MessageTextarea
-        value={text}
-        onChange={(e) => setText(e.target.value)}
+        name={name}
+        ref={ref}
+        onChange={onChange}
+        onBlur={onBlur}
         onKeyDown={handleKeyDown}
         placeholder="Сообщение"
         rows={1}
-        disabled={disabled || sending}
+        disabled={disabled || isSubmitting}
         maxLength={4000}
       />
       <SendBtn
         type="submit"
-        disabled={disabled || sending || !text.trim()}
+        disabled={disabled || isSubmitting || !text.trim()}
         aria-label="Отправить"
       >
         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">

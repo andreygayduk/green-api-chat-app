@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useForm } from 'react-hook-form'
 import { DEFAULT_API_URL } from '../constants'
 import { useAuth } from '../context/useAuth'
 import {
@@ -12,32 +12,46 @@ import {
   LoginTitle,
 } from './LoginForm.styles'
 
+interface LoginFormValues {
+  idInstance: string
+  apiTokenInstance: string
+  apiUrl: string
+}
+
 export function LoginForm() {
   const { login } = useAuth()
-  const [idInstance, setIdInstance] = useState('')
-  const [apiTokenInstance, setApiTokenInstance] = useState('')
-  const [apiUrl, setApiUrl] = useState(DEFAULT_API_URL)
-  const [error, setError] = useState('')
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    defaultValues: {
+      idInstance: '',
+      apiTokenInstance: '',
+      apiUrl: DEFAULT_API_URL,
+    },
+  })
 
-  const handleSubmit = (event: FormEvent) => {
-    event.preventDefault()
-    setError('')
+  const onSubmit = (data: LoginFormValues) => {
+    const idInstance = data.idInstance.trim()
+    const apiTokenInstance = data.apiTokenInstance.trim()
 
-    if (!idInstance.trim() || !apiTokenInstance.trim()) {
-      setError('Заполните idInstance и apiTokenInstance')
+    if (!idInstance || !apiTokenInstance) {
+      setError('root', { message: 'Заполните idInstance и apiTokenInstance' })
       return
     }
 
     login({
-      idInstance: idInstance.trim(),
-      apiTokenInstance: apiTokenInstance.trim(),
-      apiUrl: apiUrl.trim() || DEFAULT_API_URL,
+      idInstance,
+      apiTokenInstance,
+      apiUrl: data.apiUrl.trim() || DEFAULT_API_URL,
     })
   }
 
   return (
     <LoginPage>
-      <LoginCard onSubmit={handleSubmit}>
+      <LoginCard noValidate={true} onSubmit={handleSubmit(onSubmit)}>
         <LoginLogo aria-hidden="true">
           <span>M</span>
         </LoginLogo>
@@ -50,11 +64,9 @@ export function LoginForm() {
           <span>idInstance</span>
           <input
             type="text"
-            value={idInstance}
-            onChange={(e) => setIdInstance(e.target.value)}
             placeholder="3100000001"
             autoComplete="off"
-            required
+            {...register('idInstance', { required: true })}
           />
         </Field>
 
@@ -62,11 +74,9 @@ export function LoginForm() {
           <span>apiTokenInstance</span>
           <input
             type="password"
-            value={apiTokenInstance}
-            onChange={(e) => setApiTokenInstance(e.target.value)}
             placeholder="Токен инстанса"
             autoComplete="off"
-            required
+            {...register('apiTokenInstance', { required: true })}
           />
         </Field>
 
@@ -74,13 +84,16 @@ export function LoginForm() {
           <span>apiUrl</span>
           <input
             type="url"
-            value={apiUrl}
-            onChange={(e) => setApiUrl(e.target.value)}
             placeholder={DEFAULT_API_URL}
+            {...register('apiUrl')}
           />
         </Field>
 
-        {error ? <LoginError>{error}</LoginError> : null}
+        {errors.root || errors.idInstance || errors.apiTokenInstance ? (
+          <LoginError>
+            {errors.root?.message ?? 'Заполните idInstance и apiTokenInstance'}
+          </LoginError>
+        ) : null}
 
         <LoginSubmit type="submit">Войти</LoginSubmit>
       </LoginCard>

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useForm } from 'react-hook-form'
 import {
   BtnPrimary,
   BtnSecondary,
@@ -15,29 +15,28 @@ interface NewChatModalProps {
   onCreate: (phoneOrChatId: string) => Promise<void>
 }
 
+interface NewChatFormValues {
+  value: string
+}
+
 export function NewChatModal({ onClose, onCreate }: NewChatModalProps) {
-  const [value, setValue] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<NewChatFormValues>({
+    defaultValues: { value: '' },
+  })
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
-    setError('')
-
-    const trimmed = value.trim()
-    if (!trimmed) {
-      setError('Введите номер телефона или chatId')
-      return
-    }
-
-    setLoading(true)
+  const onSubmit = async (data: NewChatFormValues) => {
     try {
-      await onCreate(trimmed)
+      await onCreate(data.value.trim())
       onClose()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Не удалось создать чат')
-    } finally {
-      setLoading(false)
+      setError('root', {
+        message: err instanceof Error ? err.message : 'Не удалось создать чат',
+      })
     }
   }
 
@@ -53,24 +52,27 @@ export function NewChatModal({ onClose, onCreate }: NewChatModalProps) {
           Номер телефона (79991234567) или chatId получателя в MAX
         </ModalHint>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <ModalInput
             type="text"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
             placeholder="79991234567"
             autoFocus
-            disabled={loading}
+            disabled={isSubmitting}
+            {...register('value', {
+              required: 'Введите номер телефона или chatId',
+            })}
           />
 
-          {error ? <ModalError>{error}</ModalError> : null}
+          {errors.value || errors.root ? (
+            <ModalError>{errors.value?.message ?? errors.root?.message}</ModalError>
+          ) : null}
 
           <ModalActions>
-            <BtnSecondary type="button" onClick={onClose} disabled={loading}>
+            <BtnSecondary type="button" onClick={onClose} disabled={isSubmitting}>
               Отмена
             </BtnSecondary>
-            <BtnPrimary type="submit" disabled={loading}>
-              {loading ? 'Создание…' : 'Создать'}
+            <BtnPrimary type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Создание…' : 'Создать'}
             </BtnPrimary>
           </ModalActions>
         </form>
