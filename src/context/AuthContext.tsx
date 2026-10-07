@@ -1,5 +1,6 @@
 'use client'
 
+import Cookies from 'js-cookie'
 import {
   useCallback,
   useEffect,
@@ -13,7 +14,7 @@ import { AuthContext } from './authContextValue'
 
 function loadCredentials(): Credentials | null {
   try {
-    const raw = localStorage.getItem(CREDENTIALS_STORAGE_KEY)
+    const raw = Cookies.get(CREDENTIALS_STORAGE_KEY)
     if (!raw) return null
     const parsed = JSON.parse(raw) as Credentials
     if (!parsed.idInstance || !parsed.apiTokenInstance) return null
@@ -42,12 +43,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       apiTokenInstance: next.apiTokenInstance.trim(),
       apiUrl: (next.apiUrl || DEFAULT_API_URL).replace(/\/$/, ''),
     }
-    localStorage.setItem(CREDENTIALS_STORAGE_KEY, JSON.stringify(normalized))
+    Cookies.set(CREDENTIALS_STORAGE_KEY, JSON.stringify(normalized), {
+      path: '/',
+      sameSite: 'lax',
+      expires: 365,
+      secure: location.protocol === 'https:',
+    })
     setCredentials(normalized)
   }, [])
 
   const logout = useCallback(() => {
-    localStorage.removeItem(CREDENTIALS_STORAGE_KEY)
+    Cookies.remove(CREDENTIALS_STORAGE_KEY, { path: '/' })
     setCredentials(null)
   }, [])
 
